@@ -7,6 +7,7 @@ import (
 type Store interface {
 	Migrate() error
 	Song() SongRepository
+	Close() error
 }
 
 type SongRepository interface {

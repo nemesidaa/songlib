@@ -61,3 +61,11 @@ func (impl *Store) Song() interfaces.SongRepository {
 	}
 	return impl.songRepo
 }
+
+func (impl *Store) Close() error {
+	sqlDB, err := impl.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

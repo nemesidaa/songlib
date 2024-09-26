@@ -20,7 +20,7 @@ type Service struct {
 	httpc  *httpclient.Client
 }
 
-func NewService(dbConnString string) (*Service, error) {
+func NewService(dbConnString, extApiUrl string) (*Service, error) {
 	logger := logger.GetLogger()
 	db, err := storage.Init(logger, dbConnString)
 	if err != nil {
@@ -35,7 +35,7 @@ func NewService(dbConnString string) (*Service, error) {
 		app:    fiber.New(),
 		db:     db,
 		logger: logger,
-		httpc:  httpclient.NewClient(),
+		httpc:  httpclient.NewClient(extApiUrl),
 	}, nil
 }
 
@@ -53,6 +53,10 @@ func (s *Service) ConfRoutes() {
 
 	s.app.Get("/swagger/*", swagger.HandlerDefault) // Обработка Swagger UI
 
+}
+
+func (s *Service) CloseDBConn() error {
+	return s.db.Close()
 }
 
 func (s *Service) Listen(host string, port string) error {

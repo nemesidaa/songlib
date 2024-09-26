@@ -38,13 +38,13 @@ func (s *Service) Filter(c *fiber.Ctx) error {
 		s.logger.Warnf("Error parsing page in /songs: %v", err)
 		page = 1
 	}
-	s.logger.Infof("Got page %d in /songs", page)
+	s.logger.Debugf("Got page %d in /songs", page)
 	size, err := strconv.Atoi(c.Query("size"))
 	if err != nil {
 		s.logger.Warnf("Error parsing size in /songs: %v", err)
 		size = 10
 	}
-	s.logger.Infof("Got size %d in /songs", size)
+	s.logger.Debugf("Got size %d in /songs", size)
 	req := new(ListRequest)
 	if err := c.BodyParser(req); err != nil {
 		s.logger.Errorf("Error parsing body in /songs: %v", err)
@@ -52,7 +52,7 @@ func (s *Service) Filter(c *fiber.Ctx) error {
 			Message: err.Error(),
 		})
 	}
-	s.logger.Infof("Got filter %v in /songs", req.Filtermap)
+	s.logger.Debugf("Got filter %v in /songs", req.Filtermap)
 	songs, err := s.db.Song().GetList(req.Filtermap, page, size)
 	if err != nil {
 		s.logger.Errorf("Error getting songs in /songs: %v", err)
@@ -164,9 +164,9 @@ func (s *Service) CreateSong(c *fiber.Ctx) error {
 		Group: req.Group,
 		Song:  req.Song,
 	}
-	data, err := s.httpc.DataMock()
+	data, err := s.httpc.DataMock() // GetDataFromAPI(req.Group, req.Song) // DoMock можно использовать для тестов, если api лежачий
 	if err != nil {
-		s.logger.Errorf("Error getting data in /song: %v", err)
+		s.logger.Errorf("Error getting data from API in /song: %v", err)
 		return c.Status(500).JSON(&ErrorResponse{
 			Message: err.Error(),
 		})

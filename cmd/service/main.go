@@ -27,13 +27,14 @@ func main() {
 		log.Fatalf("Ошибка загрузки .env файла: %v", err)
 	}
 
-	logger.InitLogger()
+	logger.InitLogger(os.Getenv("LOG_DEST"), os.Getenv("LOG_LEVEL"))
 	logger := logger.GetLogger()
 	logger.Info("Starting service...")
-	service, err := service.NewService(os.Getenv("DB_CONNSTR"))
+	service, err := service.NewService(os.Getenv("DB_CONNSTR"), os.Getenv("API_URL"))
 	if err != nil {
 		logger.Fatal(err)
 	}
+	defer service.CloseDBConn()
 
 	service.ConfRoutes()
 
