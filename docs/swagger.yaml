@@ -1,0 +1,210 @@
+basePath: /
+definitions:
+  model.Song:
+    properties:
+      group:
+        type: string
+      id:
+        type: string
+      link:
+        type: string
+      releaseDate:
+        description: as additional, from the external API
+        type: string
+      song:
+        type: string
+      text:
+        type: string
+    type: object
+  service.CreateRequest:
+    description: Payload for creating a new song
+    properties:
+      group:
+        example: Muse
+        type: string
+      song:
+        example: Supermassive Black Hole
+        type: string
+    type: object
+  service.ErrorResponse:
+    description: Error response
+    properties:
+      message:
+        type: string
+    type: object
+  service.ListRequest:
+    description: Payload for filtering song list
+    properties:
+      filter:
+        additionalProperties: true
+        description: 'example: {"like:group": "Mu%"}'
+        type: object
+    type: object
+  service.ListResponse:
+    description: Response containing a list of songs
+    properties:
+      songs:
+        items:
+          $ref: '#/definitions/model.Song'
+        type: array
+    type: object
+  service.UpdateRequest:
+    description: Payload for updating a song
+    properties:
+      data:
+        additionalProperties: true
+        description: 'example: {"song": "New Song Title"}'
+        type: object
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: egor200619@gmail.com
+    name: API Support
+    url: <...>
+  description: This is a sample API for managing a song library
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Song Library API
+  version: "1.0"
+paths:
+  /song:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new song to the library
+      parameters:
+      - description: Song creation data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Song'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Create a new song
+      tags:
+      - songs
+  /song/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a song by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Delete a song
+      tags:
+      - songs
+    get:
+      consumes:
+      - application/json
+      description: Retrieves details of a song by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Song'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Get song details
+      tags:
+      - songs
+    put:
+      consumes:
+      - application/json
+      description: Updates song details by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated song data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Update a song
+      tags:
+      - songs
+  /songs:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves a list of songs filtered by specified fields with pagination
+        support
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: size
+        type: integer
+      - description: Filter parameters
+        in: body
+        name: filter
+        required: true
+        schema:
+          $ref: '#/definitions/service.ListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.ListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/service.ErrorResponse'
+      summary: Get filtered songs with pagination
+      tags:
+      - songs
+swagger: "2.0"

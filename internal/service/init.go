@@ -7,7 +7,10 @@ import (
 	storage "songlib/internal/sql/storage/implementation"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	"github.com/sirupsen/logrus"
+
+	_ "songlib/docs"
 )
 
 type Service struct {
@@ -47,6 +50,8 @@ func (s *Service) ConfRoutes() {
 	s.app.Put("/song/:id", s.UpdateSong)
 	// Добавление новой песни
 	s.app.Post("/song", s.CreateSong)
+
+	s.app.Get("/swagger/*", swagger.HandlerDefault) // Обработка Swagger UI
 
 }
 

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"songlib/internal/sql/model"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -27,7 +28,24 @@ func (impl *SongRepository) GetList(filter map[string]interface{}, page, pageSiz
 
 	// Применение фильтров
 	for key, value := range filter {
-		query = query.Where(key+" = ?", value)
+		// Если значение строки начинается с "like:", используем оператор LIKE
+		if strings.HasPrefix(key, "like:") {
+			// Извлекаем фактическое имя столбца
+			columnName := strings.TrimPrefix(key, "like:")
+			// Оборачиваем зарезервированные слова в двойные кавычки
+			if columnName == "group" {
+				query = query.Where("\"group\" LIKE ?", value)
+			} else {
+				query = query.Where(columnName+" LIKE ?", value)
+			}
+		} else {
+			// Обернуть зарезервированные слова в двойные кавычки для обычного фильтра
+			if key == "group" {
+				query = query.Where("\"group\" = ?", value)
+			} else {
+				query = query.Where(key+" = ?", value)
+			}
+		}
 	}
 
 	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Find(&songs).Error; err != nil {
