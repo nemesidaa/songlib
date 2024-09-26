@@ -164,7 +164,7 @@ func (s *Service) CreateSong(c *fiber.Ctx) error {
 		Group: req.Group,
 		Song:  req.Song,
 	}
-	data, err := s.httpc.DataMock() // GetDataFromAPI(req.Group, req.Song) // DoMock можно использовать для тестов, если api лежачий
+	data, err := s.httpc.GetDataFromAPI(req.Group, req.Song) // GetDataFromAPI(req.Group, req.Song) // DoMock можно использовать для тестов, если api лежачий
 	if err != nil {
 		s.logger.Errorf("Error getting data from API in /song: %v", err)
 		return c.Status(500).JSON(&ErrorResponse{
