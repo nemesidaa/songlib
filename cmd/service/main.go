@@ -13,7 +13,7 @@ import (
 // @version 1.0
 // @description This is a sample API for managing a song library
 // @contact.name API Support
-// @contact.url <...>
+// @contact.url tg:https://t.me/nowerealldied
 // @contact.email egor200619@gmail.com
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT

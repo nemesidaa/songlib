@@ -76,6 +76,13 @@ func (s *Service) Filter(c *fiber.Ctx) error {
 // @Router /song/{id} [get]
 func (s *Service) GetSong(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if id == "" {
+		s.logger.Errorf("Error getting song in /song: id is empty")
+		return c.Status(500).JSON(&ErrorResponse{
+			Message: "id is empty",
+		})
+	}
+	s.logger.Debugf("Got id %s in /song", id)
 	song, err := s.db.Song().GetByID(id)
 	if err != nil {
 		s.logger.Errorf("Error getting song in /song: %v", err)
@@ -99,6 +106,13 @@ func (s *Service) GetSong(c *fiber.Ctx) error {
 // @Router /song/{id} [delete]
 func (s *Service) DeleteSong(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if id == "" {
+		s.logger.Errorf("Error deleting song in /song: id is empty")
+		return c.Status(500).JSON(&ErrorResponse{
+			Message: "id is empty",
+		})
+	}
+	s.logger.Debugf("Got id %s in /song", id)
 	err := s.db.Song().Delete(id)
 	if err != nil {
 		s.logger.Errorf("Error deleting song in /song: %v", err)
@@ -124,6 +138,14 @@ func (s *Service) DeleteSong(c *fiber.Ctx) error {
 // @Router /song/{id} [put]
 func (s *Service) UpdateSong(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if id == "" {
+		s.logger.Errorf("Error updating song in /song: id is empty")
+		return c.Status(500).JSON(&ErrorResponse{
+			Message: "id is empty",
+		})
+	}
+	s.logger.Debugf("Got id %s in /song", id)
+
 	req := new(UpdateRequest)
 	if err := c.BodyParser(req); err != nil {
 		s.logger.Errorf("Error parsing body in /song: %v", err)
@@ -131,6 +153,7 @@ func (s *Service) UpdateSong(c *fiber.Ctx) error {
 			Message: err.Error(),
 		})
 	}
+	s.logger.Debugf("Got data %v in /song", req.Data)
 
 	if err := s.db.Song().Update(id, req.Data); err != nil {
 		s.logger.Errorf("Error updating song in /song: %v", err)
@@ -160,6 +183,8 @@ func (s *Service) CreateSong(c *fiber.Ctx) error {
 			Message: err.Error(),
 		})
 	}
+	s.logger.Debugf("Got data %v in /song", req)
+
 	song := &model.Song{
 		Group: req.Group,
 		Song:  req.Song,
@@ -174,6 +199,7 @@ func (s *Service) CreateSong(c *fiber.Ctx) error {
 	song.Link = data.Link
 	song.Text = data.Text
 	song.ReleaseDate = data.ReleaseDate
+	s.logger.Debugf("Got data from API %v in /song", data)
 
 	err = s.db.Song().Create(song)
 	if err != nil {
